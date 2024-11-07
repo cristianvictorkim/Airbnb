@@ -1,6 +1,6 @@
-from SQLite_db import insertar_usuario, insertar_propiedad, insertar_tipo_propiedad
+from sqlite_db import insertar_usuario, insertar_propiedad, insertar_tipo_propiedad
 from mongo_db import insertar_servicio
-from cassandra_db import insertar_reserva, insertar_pago
+#from cassandra_db import insertar_reserva, insertar_pago
 
 def menu():
     print()
@@ -63,9 +63,6 @@ elif opcion == "5":  # Agregar reserva en Cassandra
         insertar_pago(id_pago, estado, monto, metodo)
 '''
     
-
-
-
 def main():
     while True:
         menu()
