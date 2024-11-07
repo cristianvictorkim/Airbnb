@@ -16,28 +16,26 @@ def menu():
     print()
 
 def agregar_datos(opcion):
-    if opcion == "1":  # Agregar usuario en SQLite
+    if opcion == "1":
         nombre = input("Nombre: ")
         contacto = input("Contacto: ")
         tipo_cuenta = input("Tipo de cuenta: ")
         insertar_usuario(nombre, contacto, tipo_cuenta)
     
-    elif opcion == "2":  # Agregar propiedad en SQLite
+    elif opcion == "2": 
         precio_noche = float(input("Precio por noche: "))
         ubicacion = input("Ubicación: ")
         id_tipo = int(input("ID Tipo de propiedad: "))
         descripcion = input("Descripción: ")
         insertar_propiedad(precio_noche, ubicacion, id_tipo, descripcion)
     
-    elif opcion == "3":  # Agregar tipo de propiedad en SQLite
+    elif opcion == "3": 
         nombre = input("Nombre del tipo de propiedad: ")
         insertar_tipo_propiedad(nombre)
     
-    elif opcion == "4":  # Agregar servicio en MongoDB
+    elif opcion == "4": 
         id_servicio = input("Ingresa el ID del servicio: ")
         descripcion = input("Ingresa la descripción del servicio: ")
-
-        # Llamar a la función para insertar el servicio en la base de datos
         insertar_servicio(id_servicio, descripcion)
 
     elif opcion == "7":

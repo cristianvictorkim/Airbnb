@@ -1,7 +1,6 @@
 import sqlite3
 
 def create_connection():
-    # Conexión a la base de datos SQLite (creará el archivo si no existe)
     connection = sqlite3.connect("airbnb.db")
     return connection
 
@@ -9,7 +8,6 @@ def create_tables():
     connection = create_connection()
     cursor = connection.cursor()
 
-    # Definimos las sentencias SQL para crear cada tabla
     tables = {
         "usuario": """
             CREATE TABLE IF NOT EXISTS usuario (
@@ -94,7 +92,6 @@ def create_tables():
         """
     }
 
-    # Ejecutar cada creación de tabla en SQLite
     for table_name, table_sql in tables.items():
         cursor.execute(table_sql)
         print(f"Tabla {table_name} creada correctamente.")
@@ -135,6 +132,5 @@ def ver_usuarios():
     
     conn.close()
 
-# Ejecutar el script para crear las tablas
 if __name__ == "__main__":
     ver_usuarios()
