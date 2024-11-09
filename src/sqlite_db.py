@@ -10,7 +10,7 @@ def create_tables():
 
     tables = {
         "huesped": """
-            CREATE TABLE IF NOT EXISTS huespued (
+            CREATE TABLE IF NOT EXISTS huesped (
                 id_huesped INTEGER PRIMARY KEY,
                 nombre TEXT NOT NULL,
                 apellido TEXT,
@@ -18,7 +18,7 @@ def create_tables():
             );
         """,
         "propietario": """
-            CREATE TABLE IF NOT EXISTS huespued (
+            CREATE TABLE IF NOT EXISTS propietario (
                 id_propietario INTEGER PRIMARY KEY,
                 nombre TEXT NOT NULL,
                 apellido TEXT,
@@ -109,8 +109,10 @@ def insertar_huesped(nombre, apellido, telefono):
 def insertar_propietario(nombre, apellido, telefono, email, calificacion):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO propietario (nombre, contacto, tipo_cuenta) VALUES (?, ?, ?)",
-                   (nombre, apellido, telefono, email, calificacion))
+    cursor.execute(
+        "INSERT INTO propietario (nombre, apellido, telefono, email, calificacion) VALUES (?, ?, ?, ?, ?)",
+        (nombre, apellido, telefono, email, calificacion)
+    )
     conn.commit()
     conn.close()
 
