@@ -1,4 +1,5 @@
 import sqlite3
+from tabulate import tabulate
 
 def create_connection():
     connection = sqlite3.connect("airbnb.db")
@@ -96,7 +97,6 @@ def create_tables():
         cursor.execute(table_sql)
         print(f"Tabla {table_name} creada correctamente.")
 
-    # Guardar y cerrar la conexión
     connection.commit()
     connection.close()
 
@@ -126,10 +126,13 @@ def ver_usuarios():
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM usuario")
     usuarios = cursor.fetchall()
-    
-    for usuario in usuarios:
-        print(usuario)
-    
+
+    if usuarios:
+        headers = ["ID Usuario", "Nombre", "Contacto", "Tipo de Cuenta"]
+        print(tabulate(usuarios, headers=headers, tablefmt="fancy_grid"))
+    else:
+        print("No hay usuarios registrados.")
+
     conn.close()
 
 if __name__ == "__main__":

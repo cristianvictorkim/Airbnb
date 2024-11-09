@@ -1,6 +1,7 @@
+from redis_db import crear_reserva, agregar_pago
 from sqlite_db import insertar_usuario, insertar_propiedad, insertar_tipo_propiedad
 from mongo_db import insertar_servicio
-#from cassandra_db import insertar_reserva, insertar_pago
+from datetime import datetime
 
 def menu():
     print()
@@ -10,8 +11,8 @@ def menu():
     print("2. Agregar propiedad SQLite")
     print("3. Agregar tipo de propiedad SQLite")
     print("4. Agregar servicio MongoDB")
-    print("5. Agregar reserva")
-    print("6. Agregar pago")
+    print("5. Agregar reserva Redis")
+    print("6. Agregar pago Redis")
     print("7. Salir")
     print()
 
@@ -38,29 +39,36 @@ def agregar_datos(opcion):
         descripcion = input("Ingresa la descripción del servicio: ")
         insertar_servicio(id_servicio, descripcion)
 
+    elif opcion == "5":  
+        usuario_id = input("DNI del Usuario: ")  
+        propiedad_id = input("ID Propiedad: ")
+        fecha_inicio = input("Fecha inicio (YYYY-MM-DD): ")
+        fecha_fin = input("Fecha fin (YYYY-MM-DD): ")
+        monto = float(input("Monto Total: "))
+        metodo_pago = input("Método de pago: ")
+        estado_reserva = input("Estado de la reserva: ")
+
+        reserva_id = crear_reserva(usuario_id, propiedad_id, fecha_inicio, fecha_fin, monto, metodo_pago, estado_reserva)
+        if reserva_id:
+            print(f"Reserva {reserva_id} creada exitosamente en Redis.")
+
+    
+    elif opcion == "6": 
+        reserva_id = input("ID Reserva: ")
+        estado_pago = input("Estado del pago: ")
+        monto = float(input("Monto: "))
+        metodo_pago = input("Método de pago: ")
+        
+        pago_id = agregar_pago(reserva_id, estado_pago, monto, metodo_pago)
+        if pago_id:
+            print(f"Pago {pago_id} registrado exitosamente en Redis.")
+
     elif opcion == "7":
         print("Saliendo del programa.")
         return False
 
     return True
-'''
-elif opcion == "5":  # Agregar reserva en Cassandra
-        id_reserva = int(input("ID Reserva: "))
-        id_usuario = int(input("ID Usuario: "))
-        id_propiedad = int(input("ID Propiedad: "))
-        fecha_inicio = input("Fecha inicio (YYYY-MM-DD): ")
-        fecha_fin = input("Fecha fin (YYYY-MM-DD): ")
-        estado = input("Estado de la reserva: ")
-        insertar_reserva(id_reserva, id_usuario, id_propiedad, fecha_inicio, fecha_fin, estado)
-    
-    elif opcion == "6":  # Agregar pago en Cassandra
-        id_pago = int(input("ID Pago: "))
-        estado = input("Estado del pago: ")
-        monto = float(input("Monto: "))
-        metodo = input("Método de pago: ")
-        insertar_pago(id_pago, estado, monto, metodo)
-'''
-    
+
 def main():
     while True:
         menu()
@@ -70,3 +78,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
