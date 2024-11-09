@@ -47,7 +47,7 @@ def create_tables():
                 estado TEXT,
                 monto REAL,
                 metodo TEXT
-                FOREIGN KEY (id_reserva) REFERENCES reserva(id_reserva),
+                FOREIGN KEY (id_reserva) REFERENCES reserva(id_reserva)
             );
         """,
         "propiedad": """
@@ -184,5 +184,17 @@ def ver_huespedes():
     
     conn.close()
 
+def ver_propietarios():
+    conn = sqlite3.connect("airbnb.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM propietario where nombre = 'Jose'")
+    huespedes = cursor.fetchall()
+
+    for huesped in huespedes:
+        print(huesped)
+
+    conn.close()
+
 if __name__ == "__main__":
     ver_huespedes()
+    ver_propietarios()
