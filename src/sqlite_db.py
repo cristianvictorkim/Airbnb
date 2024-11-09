@@ -9,50 +9,56 @@ def create_tables():
     cursor = connection.cursor()
 
     tables = {
-        "usuario": """
-            CREATE TABLE IF NOT EXISTS usuario (
-                id_usuario INTEGER PRIMARY KEY,
+        "huesped": """
+            CREATE TABLE IF NOT EXISTS huespued (
+                id_huesped INTEGER PRIMARY KEY,
                 nombre TEXT NOT NULL,
-                contacto TEXT,
-                tipo_cuenta TEXT
+                apellido TEXT,
+                telefono INTEGER
+            );
+        """,
+        "propietario": """
+            CREATE TABLE IF NOT EXISTS huespued (
+                id_propietario INTEGER PRIMARY KEY,
+                nombre TEXT NOT NULL,
+                apellido TEXT,
+                telefono INTEGER,
+                email TEXT,
+                calificacion REAL
             );
         """,
         "reserva": """
             CREATE TABLE IF NOT EXISTS reserva (
                 id_reserva INTEGER PRIMARY KEY,
                 id_pago INTEGER,
+                id_huesped INTEGER,
+                id_propiedad INTEGER,
                 estado TEXT,
                 fecha_inicio TEXT,
                 fecha_fin TEXT,
-                id_usuario INTEGER,
-                id_propiedad INTEGER,
-                FOREIGN KEY (id_pago) REFERENCES pago(id_pago),
-                FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+                FOREIGN KEY (id_huesped) REFERENCES huesped(id_huesped),
                 FOREIGN KEY (id_propiedad) REFERENCES propiedad(id_propiedad)
             );
         """,
         "pago": """
             CREATE TABLE IF NOT EXISTS pago (
                 id_pago INTEGER PRIMARY KEY,
+                id_reserva INTEGER,
                 estado TEXT,
                 monto REAL,
                 metodo TEXT
+                FOREIGN KEY (id_reserva) REFERENCES reserva(id_reserva),
             );
         """,
         "propiedad": """
             CREATE TABLE IF NOT EXISTS propiedad (
                 id_propiedad INTEGER PRIMARY KEY,
-                precio_noche REAL,
+                id_propietario INTEGER,
+                precio REAL,
                 ubicacion TEXT,
-                id_tipo INTEGER,
+                tipo TEXT,
                 descripcion TEXT,
-                FOREIGN KEY (id_tipo) REFERENCES tipo_propiedad(id_tipo)
-            );
-        """,
-        "tipo_propiedad": """
-            CREATE TABLE IF NOT EXISTS tipo_propiedad (
-                id_tipo INTEGER PRIMARY KEY,
-                nombre TEXT NOT NULL
+                FOREIGN KEY (id_propietario) REFERENCES propietario(id_propietario)
             );
         """,
         "propiedad_servicio": """
@@ -67,27 +73,19 @@ def create_tables():
         "servicios": """
             CREATE TABLE IF NOT EXISTS servicios (
                 id_servicio INTEGER PRIMARY KEY,
-                descripcion TEXT NOT NULL
-            );
-        """,
-        "propiedad_usuario": """
-            CREATE TABLE IF NOT EXISTS propiedad_usuario (
-                id_propiedad INTEGER,
-                id_usuario INTEGER,
-                rol TEXT,
-                PRIMARY KEY (id_propiedad, id_usuario),
-                FOREIGN KEY (id_propiedad) REFERENCES propiedad(id_propiedad),
-                FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+                nombre TEXT NOT NULL
             );
         """,
         "reseña": """
             CREATE TABLE IF NOT EXISTS reseña (
                 id_reseña INTEGER PRIMARY KEY,
-                id_usuario INTEGER,
+                id_reserva INTEGER,
+                id_propietario INTEGER,
                 calificacion REAL,
                 comentario TEXT,
-                promedio REAL,
-                FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+                FOREIGN KEY (id_reserva) REFERENCES reserva(id_reserva),
+                FOREIGN KEY (id_propietario) REFERENCES propietario(id_propietario)
+                
             );
         """
     }
@@ -100,37 +98,89 @@ def create_tables():
     connection.commit()
     connection.close()
 
-def insertar_usuario(nombre, contacto, tipo_cuenta):
+def insertar_huesped(nombre, apellido, telefono):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO usuario (nombre, contacto, tipo_cuenta) VALUES (?, ?, ?)", (nombre, contacto, tipo_cuenta))
+    cursor.execute("INSERT INTO huesped (nombre, apellido, telefono) VALUES (?, ?, ?)",
+                   (nombre, apellido, telefono))
     conn.commit()
     conn.close()
 
-def insertar_propiedad(precio_noche, ubicacion, id_tipo, descripcion):
+def insertar_propietario(nombre, apellido, telefono, email, calificacion):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO propiedad (precio_noche, ubicacion, id_tipo, descripcion) VALUES (?, ?, ?, ?)", (precio_noche, ubicacion, id_tipo, descripcion))
+    cursor.execute("INSERT INTO propietario (nombre, contacto, tipo_cuenta) VALUES (?, ?, ?)",
+                   (nombre, apellido, telefono, email, calificacion))
     conn.commit()
     conn.close()
 
-def insertar_tipo_propiedad(nombre):
+def insertar_reserva(id_pago, id_huesped, id_propiedad, estado, fecha_inicio, fecha_fin):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO tipo_propiedad (nombre) VALUES (?)", (nombre,))
+    cursor.execute(
+        "INSERT INTO reserva (id_pago, id_huesped, id_propiedad, estado, fecha_inicio, fecha_fin) VALUES (?, ?, ?, ?, ?, ?)",
+        (id_pago, id_huesped, id_propiedad, estado, fecha_inicio, fecha_fin)
+    )
     conn.commit()
     conn.close()
 
-def ver_usuarios():
+def insertar_pago(id_reserva, estado, monto, metodo):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO pago (id_reserva, estado, monto, metodo) VALUES (?, ?, ?, ?)",
+        (id_reserva, estado, monto, metodo)
+    )
+    conn.commit()
+    conn.close()
+
+def insertar_propiedad(id_propietario, precio, ubicacion, tipo, descripcion):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO propiedad (id_propietario, precio, ubicacion, tipo, descripcion) VALUES (?, ?, ?, ?, ?)",
+        (id_propietario, precio, ubicacion, tipo, descripcion)
+    )
+    conn.commit()
+    conn.close()
+
+def insertar_propiedad_servicio(id_propiedad, id_servicio):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO propiedad_servicio (id_propiedad, id_servicio) VALUES (?, ?)",
+        (id_propiedad, id_servicio)
+    )
+    conn.commit()
+    conn.close()
+
+def insertar_servicio(nombre):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO servicios (nombre) VALUES (?)", (nombre,))
+    conn.commit()
+    conn.close()
+
+def insertar_reseña(id_reserva, id_propietario, calificacion, comentario):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO reseña (id_reserva, id_propietario, calificacion, comentario) VALUES (?, ?, ?, ?)",
+        (id_reserva, id_propietario, calificacion, comentario)
+    )
+    conn.commit()
+    conn.close()
+
+def ver_huespedes():
     conn = sqlite3.connect("airbnb.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM usuario")
-    usuarios = cursor.fetchall()
+    cursor.execute("SELECT * FROM huesped")
+    huespedes = cursor.fetchall()
     
-    for usuario in usuarios:
-        print(usuario)
+    for huesped in huespedes:
+        print(huesped)
     
     conn.close()
 
 if __name__ == "__main__":
-    ver_usuarios()
+    ver_huespedes()
